@@ -21,22 +21,29 @@ function printHelp() {
   echo "Usage: "
   echo "  network.sh <Mode> [Flags]"
   echo "    <Mode>"
-  echo "      - 'up' - bring up fabric orderer and peer nodes. No channel is created"
+  echo "      - 'up'               - bring up fabric orderer and peer nodes. No channel is created"
   echo "      - 'up createChannel' - bring up fabric network with one channel"
-  echo "      - 'createChannel' - create and join a channel after the network is created"
-  echo "      - 'deployCC' - deploy the fabcar chaincode on the channel"
-  echo "      - 'down' - clear the network with docker-compose down"
-  echo "      - 'restart' - restart the network"
+  echo "      - 'createChannel'    - create and join a channel after the network is created"
+  echo "      - 'deployCC'         - deploy the fabcar chaincode on the channel"
+  echo "      - 'deployAnyCC'      - deploy the chaincode with given parameters on the channel"
+  echo "      - 'callCC'           - deploy the function of chaincode with given arguments on the channel"
+  echo "      - 'down'             - clear the network with docker-compose down"
+  echo "      - 'restart'          - restart the network"
   echo
   echo "    Flags:"
-  echo "    -ca <use CAs> -  create Certificate Authorities to generate the crypto material"
-  echo "    -c <channel name> - channel name to use (defaults to \"mychannel\")"
-  echo "    -s <dbtype> - the database backend to use: goleveldb (default) or couchdb"
-  echo "    -r <max retry> - CLI times out after certain number of attempts (defaults to 5)"
-  echo "    -d <delay> - delay duration in seconds (defaults to 3)"
-  echo "    -l <language> - the programming language of the chaincode to deploy: go (default), java, javascript, typescript"
-  echo "    -v <version>  - chaincode version. Must be a round number, 1, 2, 3, etc"
-  echo "    -i <imagetag> - the tag to be used to launch the network (defaults to \"latest\")"
+  echo "    -ca   <use CAs> -  create Certificate Authorities to generate the crypto material"
+  echo "    -c    <channel name> - channel name to use (defaults to \"mychannel\")"
+  echo "    -s    <dbtype> - the database backend to use: goleveldb (default) or couchdb"
+  echo "    -r    <max retry> - CLI times out after certain number of attempts (defaults to 5)"
+  echo "    -d    <delay> - delay duration in seconds (defaults to 3)"
+  echo "    -l    <language> - the programming language of the chaincode to deploy: go (default), java, javascript, typescript"
+  echo "    -v    <version>  - chaincode version. Must be a round number, 1, 2, 3, etc"
+  echo "    -i    <imagetag> - the tag to be used to launch the network (defaults to \"latest\")"
+  echo "    -cc   <chaincode name> - the name of chaincode to be called or installed"
+  echo "    -cp   <chaincode path> - the path of chaincode to be installed"
+  echo "    -fn   <chaincode function name> - the function name of chaincode to be called"
+  echo "    -fa   <chaincode function arguments> - the function arguments of chaincode to be called"
+  echo "    -init <is init function> - is the function passed use to init(default is 0 which means not, otherwise mean yes)"
   echo "    -verbose - verbose mode"
   echo "  network.sh -h (print this message)"
   echo
@@ -45,6 +52,10 @@ function printHelp() {
   echo "  network.sh up createChannel -ca -c -r -d -s -i -verbose"
   echo "  network.sh createChannel -c -r -d -verbose"
   echo "  network.sh deployCC -l -v -r -d -verbose"
+  echo "  network.sh deployAnyCC -cc fabcar -cp ../fabcar_golang_external -l external -v 1"
+  echo "  network.sh callCC -cc fabcar -fn initLedger -fa '""' --init 1"
+  echo "  network.sh callCC -cc fabcar -fn queryAllCars -fa '""'"
+  echo
   echo
   echo " Taking all defaults:"
   echo "	network.sh up"
@@ -337,6 +348,8 @@ function networkUp() {
   fi
 
   IMAGE_TAG=$IMAGETAG docker-compose ${COMPOSE_FILES} up -d 2>&1
+
+  sleep 10
 
   docker ps -a
   if [ $? -ne 0 ]; then

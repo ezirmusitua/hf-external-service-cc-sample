@@ -1,5 +1,7 @@
 bin
 .SpaceVim.d
+config/orderer.yaml
+config/configtx.yaml
 test-network/organizations/ordererOrganizations/**
 test-network/organizations/peerOrganizations/**
 test-network/channel-artifacts/*.tx

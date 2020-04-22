@@ -33,6 +33,9 @@ if [[ "$(uname -a)" == *"Linux"* ]];then
   CA_URL="https://github.com/hyperledger/fabric-ca/releases/download/v1.4.6/hyperledger-fabric-ca-linux-amd64-1.4.6.tar.gz"
 fi
 
+mkdir bin
+cd bin
+
 echo "Download fabric binaries ..."
 curl $BIN_URL -Lo fabric.tar.gz
 tar xzf fabric.tar.gz
@@ -46,3 +49,4 @@ rm ca.tar.gz
 
 sudo chmod +x **
 
+cd ..
